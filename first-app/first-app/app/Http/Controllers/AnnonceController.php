@@ -15,7 +15,9 @@ class AnnonceController extends Controller
             'titre' => 'required|string',
             'contenu' => 'required|string',
             'datepublication' => 'required|date',
-            'enseignant_id' => 'required|exists:enseignants,id',
+            'enseignant_id' => 'nullable|exists:enseignants,id',
+            'filiere_id' => 'nullable|string',
+            'niveau' => 'nullable|string',
         ]);
 
         $annonce = Annonce::create([
@@ -23,6 +25,8 @@ class AnnonceController extends Controller
             'contenu' => $request->contenu,
             'datepublication' => $request->datepublication,
             'enseignant_id' => $request->enseignant_id,
+            'filiere_id' => $request->filiere_id,
+            'niveau' => $request->niveau,
         ]);
 
         return response()->json([
@@ -35,7 +39,7 @@ class AnnonceController extends Controller
  
     public function getAllAnnonces()
     {
-        $annonces = Annonce::with('enseignant.user')->get();
+        $annonces = Annonce::with('enseignant')->get();
 
         return response()->json([
             'success' => true,

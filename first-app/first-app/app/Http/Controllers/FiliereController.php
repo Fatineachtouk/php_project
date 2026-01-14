@@ -59,7 +59,7 @@ class FiliereController extends Controller
 
     function getAllFilieres()
     {
-        $filieres = Filiere::all();
+        $filieres = Filiere::with('departement')->get();
         return response()->json($filieres);
     }
 

@@ -55,6 +55,8 @@ class EtudiantController extends Controller
             'user_id' => $user->id,
             'apogee' => $request->apogee,
             'filiere_id' => $request->filiere_id,
+            'semestre' => $request->semestre ?? 'S1',
+            'annee_universitaire' => $request->annee_universitaire ?? '2025-2026',
         ]);
 
         // Fusionner les infos dans un seul JSON
@@ -67,13 +69,15 @@ class EtudiantController extends Controller
             'role' => $user->role,
             'password' => $user->password,
             'filiere_id' => $etudiant->filiere_id,
+            'semestre' => $etudiant->semestre,
+            'annee_universitaire' => $etudiant->annee_universitaire,
         ]);
     }
 
 
     function getAllEtudiant()
     {
-        $etudiants = Etudiant::with('user')->get();
+        $etudiants = Etudiant::with('user', 'filiere')->get();
 
         return $etudiants->map(function ($etd) {
             return [
@@ -83,7 +87,10 @@ class EtudiantController extends Controller
                 'email' => $etd->user->email ?? null,
                 'apogee' => $etd->apogee,
                 'password' => $etd->user->password ?? null,
+                'filiere' => $etd->filiere->nom ?? null,
                 'filiere_id' => $etd->filiere_id,
+                'semestre' => $etd->semestre,
+                'annee_universitaire' => $etd->annee_universitaire,
             ];
         });
     }

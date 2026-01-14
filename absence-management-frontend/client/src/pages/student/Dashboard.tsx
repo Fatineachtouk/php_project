@@ -3,6 +3,25 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, CheckCircle, XCircle, BookOpen } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { annonceAPI } from '@/lib/api';
+
+interface AbsenceStat {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+}
+
+interface Annonce {
+  id: string;
+  titre: string;
+  contenu: string;
+  datepublication: string;
+  enseignant: {
+    name: string;
+    prenom: string;
+  };
+}
 
 interface AbsenceStat {
   label: string;
@@ -13,39 +32,51 @@ interface AbsenceStat {
 
 export default function StudentDashboard() {
   const [absenceStats, setAbsenceStats] = useState<AbsenceStat[]>([]);
+  const [annonces, setAnnonces] = useState<Annonce[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching absence data from backend
-    setTimeout(() => {
-      setAbsenceStats([
-        {
-          label: 'Justified Absences',
-          value: 2,
-          icon: <CheckCircle className="w-6 h-6" />,
-          color: 'bg-green-100 text-green-600',
-        },
-        {
-          label: 'Unjustified Absences',
-          value: 3,
-          icon: <XCircle className="w-6 h-6" />,
-          color: 'bg-red-100 text-red-600',
-        },
-        {
-          label: 'Total Absences',
-          value: 5,
-          icon: <AlertCircle className="w-6 h-6" />,
-          color: 'bg-amber-100 text-amber-600',
-        },
-        {
-          label: 'Attendance Rate',
-          value: 94,
-          icon: <BookOpen className="w-6 h-6" />,
-          color: 'bg-blue-100 text-blue-600',
-        },
-      ]);
-      setLoading(false);
-    }, 500);
+    const fetchData = async () => {
+      try {
+        // Fetch absence stats (simulated for now)
+        setAbsenceStats([
+          {
+            label: 'Absences Justifiées',
+            value: 2,
+            icon: <CheckCircle className="w-6 h-6" />,
+            color: 'bg-green-100 text-green-600',
+          },
+          {
+            label: 'Absences Non Justifiées',
+            value: 3,
+            icon: <XCircle className="w-6 h-6" />,
+            color: 'bg-red-100 text-red-600',
+          },
+          {
+            label: 'Total des Absences',
+            value: 5,
+            icon: <AlertCircle className="w-6 h-6" />,
+            color: 'bg-amber-100 text-amber-600',
+          },
+          {
+            label: 'Taux de Présence',
+            value: 94,
+            icon: <BookOpen className="w-6 h-6" />,
+            color: 'bg-blue-100 text-blue-600',
+          },
+        ]);
+
+        // Fetch announcements
+        const annoncesData = await annonceAPI.getAll();
+        setAnnonces(annoncesData.annonces.slice(0, 5)); // Show latest 5
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -72,15 +103,15 @@ export default function StudentDashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* My Modules */}
-          <Card className="lg:col-span-2 p-6">
-            <h3 className="text-lg font-bold text-foreground mb-4">My Modules</h3>
+          <Card className="p-6">
+            <h3 className="text-lg font-bold text-foreground mb-4">Mes Modules</h3>
             <div className="space-y-4">
               {[
-                { name: 'Data Structures', teacher: 'Prof. Ahmed Alaoui', progress: 75 },
-                { name: 'Web Development', teacher: 'Prof. Fatima Bennani', progress: 82 },
-                { name: 'Database Design', teacher: 'Prof. Mohammed Chraibi', progress: 68 },
+                { name: 'Structures de Données', teacher: 'Prof. Ahmed Alaoui', progress: 75 },
+                { name: 'Développement Web', teacher: 'Prof. Fatima Bennani', progress: 82 },
+                { name: 'Conception de Bases de Données', teacher: 'Prof. Mohammed Chraibi', progress: 68 },
               ].map((module, index) => (
                 <div key={index} className="pb-4 border-b border-border last:border-b-0">
                   <div className="flex justify-between items-start mb-2">
@@ -100,58 +131,28 @@ export default function StudentDashboard() {
               ))}
             </div>
           </Card>
-
-          {/* Quick Links */}
-          <Card className="p-6">
-            <h3 className="text-lg font-bold text-foreground mb-4">Quick Links</h3>
-            <div className="space-y-3">
-              <button className="w-full py-2.5 px-4 bg-primary hover:opacity-90 text-white rounded-lg font-medium transition-all duration-150 text-sm">
-                View Absences
-              </button>
-              <button className="w-full py-2.5 px-4 bg-secondary hover:bg-muted text-foreground rounded-lg font-medium transition-all duration-150 text-sm">
-                Download Materials
-              </button>
-              <button className="w-full py-2.5 px-4 bg-secondary hover:bg-muted text-foreground rounded-lg font-medium transition-all duration-150 text-sm">
-                View Announcements
-              </button>
-              <button className="w-full py-2.5 px-4 bg-secondary hover:bg-muted text-foreground rounded-lg font-medium transition-all duration-150 text-sm">
-                My Profile
-              </button>
-            </div>
-          </Card>
         </div>
 
         {/* Announcements */}
-        <Card className="p-6 mt-6">
-          <h3 className="text-lg font-bold text-foreground mb-4">Recent Announcements</h3>
+        <Card className="p-6">
+          <h3 className="text-lg font-bold text-foreground mb-4">Annonces Récentes</h3>
           <div className="space-y-4">
-            {[
-              {
-                title: 'Exam Schedule Released',
-                module: 'Data Structures',
-                date: '2 hours ago',
-              },
-              {
-                title: 'Assignment Deadline Extended',
-                module: 'Web Development',
-                date: '1 day ago',
-              },
-              {
-                title: 'New Course Materials Available',
-                module: 'Database Design',
-                date: '2 days ago',
-              },
-            ].map((announcement, index) => (
-              <div key={index} className="flex items-start gap-4 pb-4 border-b border-border last:border-b-0">
-                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">{announcement.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {announcement.module} • {announcement.date}
-                  </p>
+            {annonces.length > 0 ? (
+              annonces.map((annonce) => (
+                <div key={annonce.id} className="flex items-start gap-4 pb-4 border-b border-border last:border-b-0">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-foreground">{annonce.titre}</p>
+                    <p className="text-xs text-muted-foreground mb-2">{annonce.contenu}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {annonce.enseignant.name} {annonce.enseignant.prenom}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Aucune annonce récente</p>
+            )}
           </div>
         </Card>
       </DashboardLayout>

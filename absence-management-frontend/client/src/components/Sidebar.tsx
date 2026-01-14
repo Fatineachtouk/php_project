@@ -27,30 +27,23 @@ interface NavItem {
 function getSidebarItems(role: UserRole): NavItem[] {
   const baseItems: Record<UserRole, NavItem[]> = {
     admin: [
-      { label: 'Dashboard', href: '/admin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-      { label: 'Students', href: '/admin/students', icon: <Users className="w-5 h-5" /> },
-      { label: 'Teachers', href: '/admin/teachers', icon: <Briefcase className="w-5 h-5" /> },
-      { label: 'Programs', href: '/admin/programs', icon: <BookOpen className="w-5 h-5" /> },
+      { label: 'Tableau de Bord', href: '/admin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+      { label: 'Étudiants', href: '/admin/students', icon: <Users className="w-5 h-5" /> },
+      { label: 'Enseignants', href: '/admin/teachers', icon: <Briefcase className="w-5 h-5" /> },
+      { label: 'Programmes', href: '/admin/programs', icon: <BookOpen className="w-5 h-5" /> },
       { label: 'Modules', href: '/admin/modules', icon: <FileText className="w-5 h-5" /> },
-      { label: 'Schedule', href: '/admin/schedule', icon: <ClipboardList className="w-5 h-5" /> },
-      { label: 'Reports', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
     ],
     enseignant: [
-      { label: 'Dashboard', href: '/teacher/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-      { label: 'My Modules', href: '/teacher/modules', icon: <BookOpen className="w-5 h-5" /> },
+      { label: 'Tableau de Bord', href: '/teacher/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+      { label: 'Mes Modules', href: '/teacher/modules', icon: <BookOpen className="w-5 h-5" /> },
       { label: 'Classes', href: '/teacher/classes', icon: <Users className="w-5 h-5" /> },
-      { label: 'Attendance', href: '/teacher/attendance', icon: <ClipboardList className="w-5 h-5" /> },
+      { label: 'Présence', href: '/teacher/attendance', icon: <ClipboardList className="w-5 h-5" /> },
       { label: 'Documents', href: '/teacher/documents', icon: <FileText className="w-5 h-5" /> },
-      { label: 'Announcements', href: '/teacher/announcements', icon: <BarChart3 className="w-5 h-5" /> },
-      { label: 'Settings', href: '/teacher/settings', icon: <Settings className="w-5 h-5" /> },
+      { label: 'Annonces', href: '/teacher/announcements', icon: <BarChart3 className="w-5 h-5" /> },
+      { label: 'Paramètres', href: '/teacher/settings', icon: <Settings className="w-5 h-5" /> },
     ],
     etudiant: [
-      { label: 'Dashboard', href: '/student/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-      { label: 'My Absences', href: '/student/absences', icon: <ClipboardList className="w-5 h-5" /> },
-      { label: 'My Modules', href: '/student/modules', icon: <BookOpen className="w-5 h-5" /> },
-      { label: 'Documents', href: '/student/documents', icon: <FileText className="w-5 h-5" /> },
-      { label: 'Announcements', href: '/student/announcements', icon: <BarChart3 className="w-5 h-5" /> },
-      { label: 'Settings', href: '/student/settings', icon: <Settings className="w-5 h-5" /> },
+      { label: 'Tableau de Bord', href: '/student/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     ],
   };
 

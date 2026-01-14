@@ -300,34 +300,34 @@ export const presenceAPI = {
 
 export const annonceAPI = {
   getAll: () =>
-    apiRequest('/annonces', {
+    apiRequest('/api/annonces', {
       method: 'GET',
     }),
 
   getById: (id: string) =>
-    apiRequest(`/annonces/${id}`, {
+    apiRequest(`/api/annonces/${id}`, {
       method: 'GET',
     }),
 
   create: (data: any) =>
-    apiRequest('/annonces/add', {
+    apiRequest('/api/annonces/add', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   update: (id: string, data: any) =>
-    apiRequest(`/annonces/${id}`, {
+    apiRequest(`/api/annonces/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   delete: (id: string) =>
-    apiRequest(`/annonces/${id}`, {
+    apiRequest(`/api/annonces/${id}`, {
       method: 'DELETE',
     }),
 
   getByEnseignant: (enseignantId: string) =>
-    apiRequest(`/annonces/enseignant/${enseignantId}`, {
+    apiRequest(`/api/annonces/enseignant/${enseignantId}`, {
       method: 'GET',
     }),
 };

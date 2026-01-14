@@ -9,11 +9,11 @@ import { toast } from 'sonner';
 import { userAPI } from '@/lib/api';
 
 /**
- * Login Page - Common entry point for all users (Admin, Teacher, Student)
- * Design: ENSA Safi Modern Institutional
- * - Clean, professional layout
- * - Email-based authentication
- * - Role-based redirection after login
+ * Page de Connexion - Point d'entrée commun pour tous les utilisateurs (Admin, Enseignant, Étudiant)
+ * Design: ENSA Safi Moderne Institutionnel
+ * - Mise en page propre et professionnelle
+ * - Authentification basée sur l'email
+ * - Redirection basée sur le rôle après connexion
  */
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -88,13 +88,13 @@ export default function Login() {
             <span className="text-2xl font-bold text-primary-foreground">ES</span>
           </div>
           <h1 className="text-3xl font-bold text-primary mb-2">ENSA Safi</h1>
-          <p className="text-muted-foreground">Absence Management System</p>
+          <p className="text-muted-foreground">Système de Gestion des Absences</p>
         </div>
 
         {/* Login Card */}
         <Card className="shadow-xl border-0">
           <div className="p-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Welcome Back</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Bienvenue</h2>
 
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -107,12 +107,12 @@ export default function Login() {
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                  Email Address
+                  Adresse Email
                 </label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your.email@uca.ac.ma"
+                  placeholder="votre.email@uca.ac.ma"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -120,7 +120,7 @@ export default function Login() {
                   className="w-full"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Use your institutional email (email@uca.ac.ma)
+                  Utilisez votre email institutionnel (email@uca.ac.ma)
                 </p>
               </div>
 

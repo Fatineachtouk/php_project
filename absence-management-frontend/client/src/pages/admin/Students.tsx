@@ -250,6 +250,8 @@ export default function AdminStudents() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Programs</SelectItem>
+                  <SelectItem value="CP1">CP1</SelectItem>
+                  <SelectItem value="CP2">CP2</SelectItem>
                   {FILIERES.map((f) => (
                     <SelectItem key={f} value={f}>
                       {f}

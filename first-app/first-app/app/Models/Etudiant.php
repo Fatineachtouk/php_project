@@ -13,7 +13,8 @@ class Etudiant extends Model
         'apogee',
         'user_id',
         'filiere_id',
-
+        'semestre',
+        'annee_universitaire',
     ];
 
 

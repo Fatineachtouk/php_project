@@ -12,6 +12,8 @@ class Annonce extends Model
         'contenu',
         'datepublication',
         'enseignant_id',
+        'filiere_id',
+        'niveau',
     ];
 
     // Une annonce appartient à un enseignant

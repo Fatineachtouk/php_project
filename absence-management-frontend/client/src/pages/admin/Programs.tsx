@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, BookOpen } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { filiereAPI, studentAPI, moduleAPI } from '@/lib/api';
+import { filiereAPI, studentAPI } from '@/lib/api';
 
 interface Filiere {
   id: string;
@@ -12,11 +12,14 @@ interface Filiere {
   description?: string;
   semestre: number;
   annee_universitaire: string;
+  departement: {
+    id: string;
+    nom: string;
+  };
 }
 
 interface FiliereWithCounts extends Filiere {
   studentCount: number;
-  moduleCount: number;
 }
 
 export default function AdminPrograms() {
@@ -28,13 +31,11 @@ export default function AdminPrograms() {
       try {
         const filieresData = await filiereAPI.getAll();
         const filieresWithCounts = await Promise.all(
-          filieresData.map(async (filiere: Filiere) => {
+          filieresData.map(async (filiere: any) => {
             const students = await studentAPI.getByFiliere(filiere.id);
-            const modules = await moduleAPI.getByFiliere(filiere.id);
             return {
               ...filiere,
               studentCount: students.length,
-              moduleCount: modules.length,
             };
           })
         );
@@ -87,8 +88,8 @@ export default function AdminPrograms() {
                 
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-muted-foreground">Modules:</span>
-                  <span className="font-medium">{filiere.moduleCount}</span>
+                  <span className="text-sm text-muted-foreground">Département:</span>
+                  <span className="font-medium">{filiere.departement?.nom || 'N/A'}</span>
                 </div>
                 
                 <div className="pt-2 border-t">
