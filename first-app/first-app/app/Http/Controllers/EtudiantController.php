@@ -87,7 +87,7 @@ class EtudiantController extends Controller
                 'email' => $etd->user->email ?? null,
                 'apogee' => $etd->apogee,
                 'password' => $etd->user->password ?? null,
-                'filiere' => $etd->filiere->nom ?? null,
+                'filiere' => $etd->filiere_id,  // Return filiere_id instead of filiere name
                 'filiere_id' => $etd->filiere_id,
                 'semester' => intval(substr($etd->semestre, 1)), // Convert S1 to 1
                 'annee_universitaire' => $etd->annee_universitaire,

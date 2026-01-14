@@ -59,7 +59,6 @@ export default function TeacherSessions() {
   const [attendanceMarked, setAttendanceMarked] = useState(false);
 
   useEffect(() => {
-    console.log('Component mounted, user:', user);
     fetchData();
   }, []);
 
@@ -83,6 +82,8 @@ export default function TeacherSessions() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      
+      // Fetch all filieres
       const filieresData = await filiereAPI.getAll();
       setFilieres(Array.isArray(filieresData) ? filieresData : []);
 
@@ -93,32 +94,24 @@ export default function TeacherSessions() {
       ];
       setFilieres(prev => [...prev, ...additionalPrograms]);
 
-      // Fetch modules for the current teacher
-      if (user && user.role === 'enseignant') {
-        const modulesData = await moduleAPI.getByEnseignant(user.id);
+      // Fetch modules for the current teacher directly from database
+      if (user && user.role === 'enseignant' && user.enseignant_id) {
+        console.log('Fetching modules for enseignant_id:', user.enseignant_id);
+        const modulesData = await moduleAPI.getByEnseignant(user.enseignant_id);
+        console.log('Modules fetched:', modulesData);
         const teacherModules = Array.isArray(modulesData) ? modulesData : [];
+        console.log('Teacher modules (after Array check):', teacherModules);
         setAllTeacherModules(teacherModules);
-        setModules(teacherModules); // Initially show all teacher modules
-        console.log('Loaded teacher modules:', teacherModules);
+        setModules(teacherModules);
       } else {
-        console.log('User not found or not teacher:', user);
+        console.log('User not authenticated as teacher or missing enseignant_id');
+        setAllTeacherModules([]);
+        setModules([]);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      // Fallback to mock data if API fails
-      const mockModules = [
-        { id: '1', nom: 'Mathematics', filiere_id: 'GIIA' },
-        { id: '2', nom: 'Physics', filiere_id: 'GIIA' },
-        { id: '3', nom: 'Computer Science', filiere_id: 'GIIA' },
-        { id: '4', nom: 'Data Structures', filiere_id: 'GIIA' },
-        { id: '5', nom: 'Chemistry', filiere_id: 'CP1' },
-        { id: '6', nom: 'Biology', filiere_id: 'CP1' },
-        { id: '7', nom: 'Statistics', filiere_id: 'CP2' },
-        { id: '8', nom: 'Programming', filiere_id: 'CP2' },
-      ];
-      setAllTeacherModules(mockModules);
-      setModules(mockModules);
-      console.log('Using mock modules:', mockModules);
+      setAllTeacherModules([]);
+      setModules([]);
     } finally {
       setLoading(false);
     }
@@ -128,6 +121,7 @@ export default function TeacherSessions() {
     try {
       // Fetch students by filiere, semester, and year
       const studentsData = await studentAPI.getAll() as Student[];
+      // selectedFiliere is already the ID from the Select value
       const filteredStudents = studentsData.filter(student =>
         student.filiere === selectedFiliere &&
         student.semester === parseInt(selectedSemester) &&
@@ -137,68 +131,48 @@ export default function TeacherSessions() {
       console.log('Students for session:', filteredStudents);
     } catch (error) {
       console.error('Failed to fetch students for session:', error);
-      // Fallback to mock data
-      const mockStudents: Student[] = [
-        {
-          id: '1',
-          name: 'Alaoui',
-          prenom: 'Ahmed',
-          email: 'ahmed.alaoui@uca.ac.ma',
-          apogee: 'A123456',
-          filiere: selectedFiliere,
-          semester: parseInt(selectedSemester),
-          annee_universitaire: selectedYear,
-        },
-        {
-          id: '2',
-          name: 'Bennani',
-          prenom: 'Fatima',
-          email: 'fatima.bennani@uca.ac.ma',
-          apogee: 'A123457',
-          filiere: selectedFiliere,
-          semester: parseInt(selectedSemester),
-          annee_universitaire: selectedYear,
-        },
-      ];
-      setSessionStudents(mockStudents);
+      setSessionStudents([]);
     }
   };
 
   const filterModulesByFiliere = (filiereId: string) => {
-    console.log('Filtering modules for filiere:', filiereId);
-    console.log('All teacher modules:', allTeacherModules);
-
     // Filter modules by selected filiere from the stored teacher modules
-    const filteredModules = allTeacherModules.filter(module => module.filiere_id === filiereId);
-    console.log('Filtered modules for filiere', filiereId, ':', filteredModules);
+    console.log('filterModulesByFiliere called with filiereId:', filiereId);
+    console.log('allTeacherModules:', allTeacherModules);
+    
+    if (!filiereId) {
+      // No filiere selected, show all teacher modules
+      setModules(allTeacherModules);
+      return;
+    }
+    
+    const filteredModules = allTeacherModules.filter(module => {
+      const moduleFiliere = String(module.filiere_id);
+      const selectedId = String(filiereId);
+      console.log(`Comparing module filiere_id: ${moduleFiliere} with selected: ${selectedId}`);
+      return moduleFiliere === selectedId;
+    });
+    
+    console.log('Filtered modules:', filteredModules);
     setModules(filteredModules);
   };
 
   const startSession = () => {
-    console.log('Start session called with:', {
-      selectedFiliere,
-      selectedModule,
-      selectedYear,
-      selectedSemester,
-      sessionTitle,
-      modules: modules.length,
-      sessionStudents: sessionStudents.length
-    });
-
     if (!selectedFiliere || !selectedModule || !selectedYear || !selectedSemester || !sessionTitle.trim()) {
       alert('Please select filiere, module, year, semester and enter session title');
       return;
     }
 
     // Generate QR code data (in a real app, this would be a unique session ID)
+    const selectedFiliereId = selectedFiliere;
     const sessionData = {
-      filiereId: selectedFiliere,
+      filiereId: selectedFiliereId,
       moduleId: selectedModule,
       year: selectedYear,
       semester: selectedSemester,
       title: sessionTitle,
       timestamp: Date.now(),
-      teacherId: user?.id || 'current-teacher-id',
+      teacherId: user?.enseignant_id || 'current-teacher-id',
       studentIds: sessionStudents.map(s => s.id), // All students in this session
     };
 
@@ -280,7 +254,7 @@ export default function TeacherSessions() {
                   </SelectTrigger>
                   <SelectContent>
                     {filieres.map((filiere) => (
-                      <SelectItem key={filiere.id} value={filiere.id}>
+                      <SelectItem key={filiere.id} value={String(filiere.id)}>
                         {filiere.nom}
                       </SelectItem>
                     ))}
@@ -328,19 +302,29 @@ export default function TeacherSessions() {
                 <Select
                   value={selectedModule}
                   onValueChange={setSelectedModule}
-                  disabled={modules.length === 0}
+                  disabled={allTeacherModules.length === 0}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a module" />
+                    <SelectValue placeholder={allTeacherModules.length === 0 ? "No modules assigned" : "Select a module"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {modules.map((module) => (
+                    {allTeacherModules.map((module) => (
                       <SelectItem key={module.id} value={module.id}>
                         {module.nom}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {allTeacherModules.length === 0 && (
+                  <p className="text-sm text-red-600 mt-2">
+                    ❌ No modules assigned to you. Contact your administrator to assign modules.
+                  </p>
+                )}
+                {allTeacherModules.length > 0 && modules.length === 0 && selectedFiliere && (
+                  <p className="text-sm text-amber-600 mt-2">
+                    ⚠️ You don't teach any modules in the selected program. Try selecting a different program.
+                  </p>
+                )}
               </div>
 
               {/* Session Title */}
@@ -417,7 +401,7 @@ export default function TeacherSessions() {
                   </div>
 
                   <div className="text-sm text-muted-foreground">
-                    <p><strong>Program:</strong> {filieres.find(f => f.id === selectedFiliere)?.nom || selectedFiliere}</p>
+                    <p><strong>Program:</strong> {selectedFiliere}</p>
                     <p><strong>Module:</strong> {modules.find(m => m.id === selectedModule)?.nom || 'Not selected'}</p>
                     <p><strong>Year:</strong> {selectedYear}</p>
                     <p><strong>Semester:</strong> {selectedSemester}</p>

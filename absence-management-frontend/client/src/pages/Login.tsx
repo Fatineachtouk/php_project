@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { userAPI } from '@/lib/api';
+import { apiRequest } from '@/lib/api';
 
 /**
  * Page de Connexion - Point d'entrée commun pour tous les utilisateurs (Admin, Enseignant, Étudiant)
@@ -38,19 +39,27 @@ export default function Login() {
         return;
       }
 
-      // Store token and user info
+      // Store token
       localStorage.setItem('auth_token', data.token);
-      localStorage.setItem('user_id', data.user.id);
-      localStorage.setItem('user_name', data.user.name);
-      localStorage.setItem('user_prenom', data.user.prenom);
-      localStorage.setItem('user_email', data.user.email);
-      localStorage.setItem('user_role', data.user.role);
+
+      // Get user data from /users/me
+      const userData = await apiRequest('/users/me');
+
+      // Store user info
+      localStorage.setItem('user_id', userData.id);
+      localStorage.setItem('user_name', userData.name);
+      localStorage.setItem('user_prenom', userData.prenom);
+      localStorage.setItem('user_email', userData.email);
+      localStorage.setItem('user_role', userData.role);
+      if (userData.enseignant_id) {
+        localStorage.setItem('enseignant_id', userData.enseignant_id);
+      }
 
       // Update auth context
-      login(data.token, data.user);
+      login(data.token, userData);
 
       // Redirect based on role
-      switch (data.user.role) {
+      switch (userData.role) {
         case 'admin':
           setLocation('/admin/dashboard');
           break;

@@ -20,6 +20,7 @@ Route::post('/api/users/register',[UserController::class, 'createUser']);
 Route::post('/api/users/login',[UserController::class, 'login']);
 
 Route::prefix('api')->middleware('auth:sanctum')->group(function () {
+Route::get('/users/me',[UserController::class, 'me']);
 
 Route::get('/dashboard/stats',[UserController::class, 'getStats']);
 

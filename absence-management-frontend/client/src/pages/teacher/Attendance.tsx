@@ -75,50 +75,14 @@ export default function TeacherAttendance() {
       const studentsData = await studentAPI.getAll();
       setStudents(Array.isArray(studentsData) ? studentsData : []);
 
-      // Mock attendance data (in a real app, this would come from an API)
-      const mockAttendance: AttendanceRecord[] = [
-        { studentId: '1', studentName: 'Ahmed Alaoui', status: 'present', date: '2024-01-15', module: 'Mathematics' },
-        { studentId: '2', studentName: 'Fatima Bennani', status: 'absent', date: '2024-01-15', module: 'Mathematics' },
-        { studentId: '3', studentName: 'Mohammed Chraibi', status: 'late', date: '2024-01-15', module: 'Mathematics' },
-        { studentId: '4', studentName: 'Layla Darif', status: 'present', date: '2024-01-14', module: 'Physics' },
-        { studentId: '5', studentName: 'Hassan El Khatib', status: 'present', date: '2024-01-14', module: 'Physics' },
-      ];
-      setAttendanceRecords(mockAttendance);
+      // Fetch attendance records (replace with actual API call)
+      // const attendanceData = await attendanceAPI.getAll();
+      // setAttendanceRecords(Array.isArray(attendanceData) ? attendanceData : []);
+      setAttendanceRecords([]);
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      // Fallback to mock data
-      setStudents([
-        {
-          id: '1',
-          name: 'Alaoui',
-          prenom: 'Ahmed',
-          email: 'ahmed.alaoui@uca.ac.ma',
-          apogee: 'A123456',
-          filiere_id: 'GIIA',
-          semester: 3,
-          annee_universitaire: '2024-2025',
-        },
-        {
-          id: '2',
-          name: 'Bennani',
-          prenom: 'Fatima',
-          email: 'fatima.bennani@uca.ac.ma',
-          apogee: 'A123457',
-          filiere_id: 'GPMA',
-          semester: 4,
-          annee_universitaire: '2024-2025',
-        },
-        {
-          id: '3',
-          name: 'Chraibi',
-          prenom: 'Mohammed',
-          email: 'mohammed.chraibi@uca.ac.ma',
-          apogee: 'A123458',
-          filiere_id: 'GMSI',
-          semester: 5,
-          annee_universitaire: '2024-2025',
-        },
-      ]);
+      setStudents([]);
+      setAttendanceRecords([]);
     } finally {
       setLoading(false);
     }
@@ -189,7 +153,10 @@ export default function TeacherAttendance() {
   };
 
   const getFiliereName = (filiereId: string) => {
-    const filiere = filieres.find(f => f.id === filiereId);
+    let filiere = filieres.find(f => f.id === filiereId);
+    if (!filiere) {
+      filiere = filieres.find(f => f.nom === filiereId);
+    }
     return filiere ? filiere.nom : filiereId;
   };
 

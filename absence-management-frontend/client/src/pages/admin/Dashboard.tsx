@@ -30,7 +30,8 @@ export default function AdminDashboard() {
     titre: '',
     contenu: '',
     filiere_id: '',
-    niveau: ''
+    niveau: '',
+    targetAudience: 'students' // 'students' or 'professors'
   });
 
   useEffect(() => {
@@ -73,26 +74,25 @@ export default function AdminDashboard() {
         ]);
       } catch (error) {
         console.error('Failed to fetch stats:', error);
-        // Fallback to mock data
         setKpis([
           {
             label: 'Total Étudiants',
             value: 0,
-            change: 'Impossible de récupérer les données',
+            change: 'Erreur de connexion',
             icon: <Users className="w-6 h-6" />,
             color: 'bg-blue-100 text-blue-600',
           },
           {
             label: 'Total Enseignants',
             value: 0,
-            change: 'Impossible de récupérer les données',
+            change: 'Erreur de connexion',
             icon: <Briefcase className="w-6 h-6" />,
             color: 'bg-green-100 text-green-600',
           },
           {
             label: 'Total Filières',
             value: 0,
-            change: 'Impossible de récupérer les données',
+            change: 'Erreur de connexion',
             icon: <BookOpen className="w-6 h-6" />,
             color: 'bg-amber-100 text-amber-600',
           },
@@ -135,8 +135,8 @@ export default function AdminDashboard() {
         titre: annonceData.titre,
         contenu: annonceData.contenu,
         enseignant_id: enseignantId,
-        filiere_id: annonceData.filiere_id,
-        niveau: annonceData.niveau,
+        filiere_id: annonceData.targetAudience === 'students' ? annonceData.filiere_id : null,
+        niveau: annonceData.targetAudience === 'students' ? annonceData.niveau : null,
         datepublication: new Date().toISOString().split('T')[0]
       });
       
@@ -146,7 +146,8 @@ export default function AdminDashboard() {
         titre: '',
         contenu: '',
         filiere_id: '',
-        niveau: ''
+        niveau: '',
+        targetAudience: 'students'
       });
     } catch (error) {
       console.error('Failed to publish announcement:', error);
@@ -204,6 +205,19 @@ export default function AdminDashboard() {
                 </DialogHeader>
                 <form onSubmit={handleAnnonceSubmit} className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="targetAudience">Audience Cible</Label>
+                    <Select value={annonceData.targetAudience} onValueChange={(value) => handleAnnonceInputChange('targetAudience', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner l'audience" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="students">Étudiants</SelectItem>
+                        <SelectItem value="professors">Professeurs</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="titre">Titre</Label>
                     <Input
                       id="titre"
@@ -226,39 +240,41 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="filiere_id">Filière</Label>
-                      <Select value={annonceData.filiere_id} onValueChange={(value) => handleAnnonceInputChange('filiere_id', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une filière" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CP1">CP1</SelectItem>
-                          <SelectItem value="CP2">CP2</SelectItem>
-                          {filieres.map((filiere: any) => (
-                            <SelectItem key={filiere.id} value={filiere.id.toString()}>
-                              {filiere.nom}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  {annonceData.targetAudience === 'students' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="filiere_id">Filière</Label>
+                        <Select value={annonceData.filiere_id} onValueChange={(value) => handleAnnonceInputChange('filiere_id', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner une filière" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="CP1">CP1</SelectItem>
+                            <SelectItem value="CP2">CP2</SelectItem>
+                            {filieres.map((filiere: any) => (
+                              <SelectItem key={filiere.id} value={filiere.id.toString()}>
+                                {filiere.nom}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="niveau">Niveau</Label>
-                      <Select value={annonceData.niveau} onValueChange={(value) => handleAnnonceInputChange('niveau', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un niveau" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">Niveau 1</SelectItem>
-                          <SelectItem value="2">Niveau 2</SelectItem>
-                          <SelectItem value="3">Niveau 3</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-2">
+                        <Label htmlFor="niveau">Niveau</Label>
+                        <Select value={annonceData.niveau} onValueChange={(value) => handleAnnonceInputChange('niveau', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un niveau" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">Niveau 1</SelectItem>
+                            <SelectItem value="2">Niveau 2</SelectItem>
+                            <SelectItem value="3">Niveau 3</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="flex justify-end gap-3">
                     <Button type="button" variant="outline" onClick={() => setIsAnnonceDialogOpen(false)}>

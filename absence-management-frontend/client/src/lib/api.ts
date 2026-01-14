@@ -184,24 +184,24 @@ export const moduleAPI = {
   getAll: () =>
     apiRequest('/modules', {
       method: 'GET',
-    }),
+    }).then((response: any) => response.data || response),
 
   getById: (id: string) =>
     apiRequest(`/modules/${id}`, {
       method: 'GET',
-    }),
+    }).then((response: any) => response.data || response),
 
   create: (data: any) =>
     apiRequest('/modules/add', {
       method: 'POST',
       body: JSON.stringify(data),
-    }),
+    }).then((response: any) => response.data || response),
 
   update: (id: string, data: any) =>
     apiRequest(`/modules/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-    }),
+    }).then((response: any) => response.data || response),
 
   delete: (id: string) =>
     apiRequest(`/modules/${id}`, {
@@ -211,12 +211,12 @@ export const moduleAPI = {
   getByEnseignant: (enseignantId: string) =>
     apiRequest(`/modules/enseignant/${enseignantId}`, {
       method: 'GET',
-    }),
+    }).then((response: any) => response.data || response),
 
   getByFiliere: (filiereId: string) =>
     apiRequest(`/modules/filiere/${filiereId}`, {
       method: 'GET',
-    }),
+    }).then((response: any) => response.data || response),
 };
 
 // ==================== SEANCE ENDPOINTS ====================
@@ -332,37 +332,6 @@ export const annonceAPI = {
     }),
 };
 
-// ==================== DOCUMENT ENDPOINTS ====================
-
-export const documentAPI = {
-  getById: (id: string) =>
-    apiRequest(`/documents/${id}`, {
-      method: 'GET',
-    }),
-
-  create: (data: any) =>
-    apiRequest('/documents/add', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  update: (id: string, data: any) =>
-    apiRequest(`/documents/${id}`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  delete: (id: string) =>
-    apiRequest(`/documents/${id}`, {
-      method: 'DELETE',
-    }),
-
-  getByEnseignant: (enseignantId: string) =>
-    apiRequest(`/documents/enseignant/${enseignantId}`, {
-      method: 'GET',
-    }),
-};
-
 // ==================== DEPARTEMENT ENDPOINTS ====================
 
 export const departementAPI = {
@@ -416,11 +385,6 @@ export const documentsAPI = {
   delete: (id: string) =>
     apiRequest(`/documents/${id}`, {
       method: 'DELETE',
-    }),
-
-  getByModule: (moduleId: string) =>
-    apiRequest(`/documents/module/${moduleId}`, {
-      method: 'GET',
     }),
 
   getByTeacher: (teacherId: string) =>

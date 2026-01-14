@@ -79,7 +79,8 @@ class ModuleController extends Controller
     }
     function getModulesByEnseignant($enseignant_id)
     {
-        $modules = Module::where('enseignant_id', $enseignant_id)->get();
+        $modules = Module::where('enseignant_id', $enseignant_id)->with('filiere')->get();
+        \Log::info('Getting modules for enseignant_id: ' . $enseignant_id . ', found: ' . count($modules));
         return response()->json(['data' => $modules], 200);
     }
 }

@@ -8,6 +8,7 @@ export interface User {
   prenom: string;
   email: string;
   role: UserRole;
+  enseignant_id?: string;
 }
 
 interface AuthContextType {
@@ -39,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         prenom: localStorage.getItem('user_prenom') || '',
         email: localStorage.getItem('user_email') || '',
         role: (localStorage.getItem('user_role') as UserRole) || 'etudiant',
+        enseignant_id: localStorage.getItem('enseignant_id') || undefined,
       });
     }
 
@@ -54,6 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('user_prenom', newUser.prenom);
     localStorage.setItem('user_email', newUser.email);
     localStorage.setItem('user_role', newUser.role);
+    if (newUser.enseignant_id) {
+      localStorage.setItem('enseignant_id', newUser.enseignant_id);
+    }
   };
 
   const logout = () => {
@@ -65,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('user_prenom');
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_role');
+    localStorage.removeItem('enseignant_id');
   };
 
   return (

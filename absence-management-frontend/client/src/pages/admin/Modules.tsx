@@ -43,8 +43,8 @@ export default function AdminModules() {
           moduleAPI.getAll(),
           filiereAPI.getAll()
         ]);
-        setModules(modulesResponse.data || []);
-        setFilieres(filieresResponse || []);
+        setModules(Array.isArray(modulesResponse) ? modulesResponse : modulesResponse.data || []);
+        setFilieres(Array.isArray(filieresResponse) ? filieresResponse : []);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {

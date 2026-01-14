@@ -28,7 +28,8 @@ interface Student {
   prenom: string;
   email: string;
   apogee: string;
-  filiere: string;
+  filiere: any; // Can be string or object
+  filiere_id?: string;
   semester: number;
   annee_universitaire: string;
 }
@@ -89,61 +90,8 @@ export default function AdminStudents() {
         console.log('Students data:', data);
         setStudents(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.warn('Failed to fetch students from API, using mock data:', error);
-        // Use mock data as fallback
-        const mockStudents: Student[] = [
-          {
-            id: '1',
-            name: 'Alaoui',
-            prenom: 'Ahmed',
-            email: 'ahmed.alaoui@uca.ac.ma',
-            apogee: 'A123456',
-            filiere: 'GIIA',
-            semester: 3,
-            annee_universitaire: '2024-2025',
-          },
-          {
-            id: '2',
-            name: 'Bennani',
-            prenom: 'Fatima',
-            email: 'fatima.bennani@uca.ac.ma',
-            apogee: 'A123457',
-            filiere: 'GPMA',
-            semester: 4,
-            annee_universitaire: '2024-2025',
-          },
-          {
-            id: '3',
-            name: 'Chraibi',
-            prenom: 'Mohammed',
-            email: 'mohammed.chraibi@uca.ac.ma',
-            apogee: 'A123458',
-            filiere: 'GMSI',
-            semester: 5,
-            annee_universitaire: '2024-2025',
-          },
-          {
-            id: '4',
-            name: 'Darif',
-            prenom: 'Layla',
-            email: 'layla.darif@uca.ac.ma',
-            apogee: 'A123459',
-            filiere: 'CP1',
-            semester: 1,
-            annee_universitaire: '2024-2025',
-          },
-          {
-            id: '5',
-            name: 'El Khatib',
-            prenom: 'Hassan',
-            email: 'hassan.elkhatib@uca.ac.ma',
-            apogee: 'A123460',
-            filiere: 'GTR',
-            semester: 6,
-            annee_universitaire: '2024-2025',
-          },
-        ];
-        setStudents(mockStudents);
+        console.warn('Failed to fetch students from API:', error);
+        setStudents([]);
       }
     } finally {
       setLoading(false);
@@ -152,7 +100,10 @@ export default function AdminStudents() {
 
   const getFiliereName = (filiereId: string) => {
     console.log('Looking for filiere with id:', filiereId, 'in filieres:', filieres);
-    const filiere = filieres.find(f => f.id === filiereId);
+    let filiere = filieres.find(f => f.id === filiereId);
+    if (!filiere) {
+      filiere = filieres.find(f => f.nom === filiereId);
+    }
     const result = filiere ? filiere.nom : filiereId; // fallback to id if not found
     console.log('Found filiere:', filiere, 'returning:', result);
     return result;
@@ -174,7 +125,12 @@ export default function AdminStudents() {
 
     // Filiere filter
     if (selectedFiliere && selectedFiliere !== 'all') {
-      filtered = filtered.filter((s) => s.filiere === selectedFiliere);
+      filtered = filtered.filter((s) => {
+        const filiereId = s.filiere_id || (s.filiere && typeof s.filiere === 'object' ? s.filiere.id : s.filiere);
+        if (!filiereId) return false;
+        const studentFiliere = getFiliereName(filiereId);
+        return studentFiliere === selectedFiliere;
+      });
     }
 
     // Semester filter
@@ -278,7 +234,7 @@ export default function AdminStudents() {
                 <SelectContent>
                   <SelectItem value="all">All Programs</SelectItem>
                   {filieres.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
+                    <SelectItem key={f.id} value={f.nom}>
                       {f.nom}
                     </SelectItem>
                   ))}
@@ -386,7 +342,7 @@ export default function AdminStudents() {
                       <td className="table-cell font-mono text-sm">{student.apogee}</td>
                       <td className="table-cell">
                         <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
-                          {getFiliereName(student.filiere)}
+                          {student.filiere_id ? getFiliereName(student.filiere_id) : student.filiere && typeof student.filiere === 'object' ? student.filiere.nom : student.filiere || 'N/A'}
                         </span>
                       </td>
                       <td className="table-cell text-center">{student.semester}</td>

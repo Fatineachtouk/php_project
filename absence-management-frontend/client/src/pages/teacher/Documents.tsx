@@ -28,13 +28,10 @@ interface Module {
 
 interface DocumentFile {
   id: string;
-  name: string;
+  titre: string;
   url: string;
-  filiere_id: string;
-  module_id: string;
-  semester: number;
-  annee_universitaire: string;
-  uploaded_at: string;
+  dateupload: string;
+  enseignant_id: number;
 }
 
 const ACADEMIC_YEARS = ['2023-2024', '2024-2025', '2025-2026'];
@@ -42,13 +39,7 @@ const SEMESTERS = [1, 2, 3, 4, 5, 6];
 
 export default function TeacherDocuments() {
   const { user } = useAuth();
-  const [filieres, setFilieres] = useState<Filiere[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
   const [documents, setDocuments] = useState<DocumentFile[]>([]);
-  const [selectedFiliere, setSelectedFiliere] = useState('');
-  const [selectedModule, setSelectedModule] = useState('');
-  const [selectedSemester, setSelectedSemester] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -58,10 +49,8 @@ export default function TeacherDocuments() {
   }, []);
 
   useEffect(() => {
-    if (selectedFiliere) {
-      fetchModulesByFiliere(selectedFiliere);
-    }
-  }, [selectedFiliere]);
+    fetchModulesByFiliere(selectedFiliere);
+  }, [selectedFiliere, modules]);
 
   const fetchData = async () => {
     try {
@@ -78,40 +67,28 @@ export default function TeacherDocuments() {
 
       // Fetch modules for the current teacher
       if (user && user.role === 'enseignant') {
-        const modulesData = await moduleAPI.getByEnseignant(user.id);
-        setModules(Array.isArray(modulesData) ? modulesData : []);
+        try {
+          const modulesData = await moduleAPI.getByEnseignant(user.enseignant_id);
+          const teacherModules = Array.isArray(modulesData) ? modulesData : [];
+          setModules(teacherModules);
+          setFilteredModules(teacherModules); // Initially show all teacher modules
+        } catch (error) {
+          console.warn('Failed to fetch modules from API:', error);
+          setModules([]);
+          setFilteredModules([]);
+        }
       }
 
       // Fetch documents for the current teacher
       if (user && user.role === 'enseignant') {
-        const documentsData = await documentsAPI.getByTeacher(user.id);
-        setDocuments(Array.isArray(documentsData) ? documentsData : []);
-      }
-
-      // Mock documents data (fallback if API fails)
-      const mockDocuments: DocumentFile[] = [
-        {
-          id: '1',
-          name: 'Course Syllabus.pdf',
-          url: '#',
-          filiere_id: 'GIIA',
-          module_id: '1',
-          semester: 3,
-          annee_universitaire: '2024-2025',
-          uploaded_at: '2024-01-15'
-        },
-        {
-          id: '2',
-          name: 'Lecture Notes.pdf',
-          url: '#',
-          filiere_id: 'GIIA',
-          module_id: '2',
-          semester: 3,
-          annee_universitaire: '2024-2025',
-          uploaded_at: '2024-01-14'
+        try {
+          const documentsData = await documentsAPI.getByTeacher(user.id);
+          setDocuments(Array.isArray(documentsData) ? documentsData : []);
+        } catch (error) {
+          console.warn('Failed to fetch documents from API:', error);
+          setDocuments([]);
         }
-      ];
-      setDocuments(mockDocuments);
+      }
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -119,10 +96,14 @@ export default function TeacherDocuments() {
     }
   };
 
-  const fetchModulesByFiliere = async (filiereId: string) => {
+  const fetchModulesByFiliere = (filiereId: string) => {
     // Filter modules by selected filiere
-    const filteredModules = modules.filter(module => module.filiere_id === filiereId);
-    setModules(filteredModules);
+    if (filiereId) {
+      const filtered = modules.filter(module => module.filiere_id === filiereId);
+      setFilteredModules(filtered);
+    } else {
+      setFilteredModules(modules); // Show all modules when no filiere selected
+    }
   };
 
   const handleFileUpload = async () => {
